@@ -1,21 +1,18 @@
 #!/usr/bin/env python3
 """
 WCC AI Learning Series - Session 1 Live Demo
-Progressive Chatbot Building - Uncomment sections step by step!
+Progressive Chatbot Building - Modular Approach
 
 INSTRUCTIONS FOR LIVE DEMO:
-1. Start with SECTION 1 (already active)
-2. To activate SECTION 2: Delete the triple quotes
-3. To activate SECTION 3: Delete the triple quotes
-4. To activate SECTION 4: Delete the triple quotes
-5. To activate SECTION 5: Delete the triple quotes
+Comment/uncomment method calls at the bottom to show each step:
 
-Demo Flow:
-1. Basic API call (START HERE - ACTIVE)
-2. Add personality with system prompt (SECTION 2)
-3. Add conversation memory (SECTION 3)
-4. Explore model parameters (SECTION 4)
-5. Create web interface (SECTION 5)
+Step 1: step_1_basic_api_call()
+Step 2: step_2_add_personality()
+Step 3: step_3_conversation_memory()
+Step 4: step_4_model_parameters()
+Step 5: step_5_streamlit_interface()
+
+Each step builds on the previous one, showing clear code differences!
 """
 
 import os
@@ -32,38 +29,18 @@ try:
 except Exception:
     pass
 
-
-# =============================================================================
-# SECTION 1: BASIC API CALL (START HERE - ALREADY ACTIVE)
-# =============================================================================
+# Configure Gemini API (done once at startup)
+api_key = os.getenv('GEMINI_API_KEY') or 'your-gemini-api-key-here'
+genai.configure(api_key=api_key)
 
 print("🚀 WCC AI Learning Series - Session 1 Demo")
 print("=" * 50)
 
-# Configure Gemini API
-api_key = os.getenv('GEMINI_API_KEY') or 'your-gemini-api-key-here'
-genai.configure(api_key=api_key)
-
-# Create the simplest possible model instance
-model = genai.GenerativeModel(MODEL_ID)
-'''
-# Our first AI interaction!
-print("STEP 1: Basic API Call")
-print("-" * 30)
-
-response = model.generate_content("What is Women Coding Community (WCC)?")
-print(f"AI Response: {response.text}")
-print("\n🎉 SUCCESS! You just talked to AI! 🎉\n")
-
 # =============================================================================
-# SECTION 2: ADD PERSONALITY
+# SHARED SYSTEM PROMPT (Used by Steps 2-5)
 # =============================================================================
 
-print("STEP 2: Adding Personality with System Prompts")
-print("-" * 45)
-'''
-# Define WCC knowledge and personality
-wcc_system_prompt = '''You are a helpful and enthusiastic assistant for the Women Coding Community (WCC).
+WCC_SYSTEM_PROMPT = '''You are a helpful and enthusiastic assistant for the Women Coding Community (WCC).
 
 ABOUT WCC:
 - WCC is a vibrant community supporting women in technology
@@ -84,171 +61,207 @@ HOW TO HELP:
 - If you don't know something specific, suggest they check our Slack or website
 '''
 
-# Create model with system prompt
-model_with_personality = genai.GenerativeModel(
-    MODEL_ID,
-    system_instruction=wcc_system_prompt
-)
-
-# Test questions with personality
-test_questions = [
-    "What is WCC?",
-    "How can I join?", 
-    "I'm new to coding, can WCC help me?",
-    "What events do you have?"
-]
-
-for question in test_questions:
-    print(f"\nQ: {question}")
-    response = model_with_personality.generate_content(question)
-    print(f"A: {response.text}")
-    print("-" * 40)
-
-print("\n🌟 PERSONALITY ADDED! Notice how responses are more WCC-focused! 🌟\n")
-
 
 # =============================================================================
-# SECTION 3: ADD CONVERSATION MEMORY
+# STEP 1: BASIC API CALL
 # =============================================================================
 
-"""
-print("STEP 3: Adding Conversation Memory")
-print("-" * 35)
-
-class WCCChatBot:
-    def __init__(self):
-        self.model = genai.GenerativeModel(
-            MODEL_ID,
-            system_instruction=wcc_system_prompt
-        )
-        self.conversation_history = []
+def step_1_basic_api_call():
+    """
+    STEP 1: Make a simple API call to Gemini
     
-    def chat(self, user_input):
-        # Add user message to history
-        self.conversation_history.append(f"User: {user_input}")
-        
-        # Create context with conversation history
-        context = "\\n".join(self.conversation_history[-10:])  # Keep last 10 messages
-        full_prompt = f"Conversation so far:\\n{context}\\n\\nUser: {user_input}\\n\\nAssistant:"
-        
-        # Generate response
-        response = self.model.generate_content(full_prompt)
-        
-        # Add assistant response to history
-        self.conversation_history.append(f"Assistant: {response.text}")
-        
-        return response.text
+    What we're learning:
+    - How to create a model instance
+    - How to send a prompt and get a response
+    """
+    print("\n" + "=" * 60)
+    print("STEP 1: Basic API Call")
+    print("=" * 60)
+    
+    # Create the simplest possible model instance
+    model = genai.GenerativeModel(MODEL_ID)
+    
+    # Make a simple request
+    print("\n📝 Sending prompt: 'What is Women Coding Community (WCC)?'")
+    response = model.generate_content("What is Women Coding Community (WCC)?")
+    
+    print(f"\n✅ Response:\n{response.text}")
+    print("\n🎉 SUCCESS! You just talked to AI! 🎉\n")
 
-# Test conversation memory
-chatbot = WCCChatBot()
-
-print("Testing conversation memory:")
-print("=" * 30)
-
-response1 = chatbot.chat("Hi, I'm Sarah and I'm new to programming")
-print(f"User: Hi, I'm Sarah and I'm new to programming")
-print(f"Bot: {response1}\\n")
-
-response2 = chatbot.chat("What programming language should I start with?")
-print(f"User: What programming language should I start with?")
-print(f"Bot: {response2}\\n")
-
-response3 = chatbot.chat("Do you remember my name?")
-print(f"User: Do you remember my name?")
-print(f"Bot: {response3}\\n")
-
-print("🧠 MEMORY ADDED! Bot remembers the conversation! 🧠\\n")
-"""
 
 # =============================================================================
-# SECTION 4: EXPLORE MODEL PARAMETERS
+# STEP 2: ADD PERSONALITY WITH SYSTEM PROMPTS
 # =============================================================================
 
-"""
-print("STEP 4: Understanding Model Parameters")
-print("-" * 40)
+def step_2_add_personality():
+    """
+    STEP 2: Add personality using system prompts
+    
+    What we're learning:
+    - How system prompts shape AI behavior
+    - How to give the AI a specific role/personality
+    - The difference between generic and specialized responses
+    """
+    print("\n" + "=" * 60)
+    print("STEP 2: Adding Personality with System Prompts")
+    print("=" * 60)
+    
+    # Create model WITH system prompt (compare to Step 1)
+    model_with_personality = genai.GenerativeModel(
+        MODEL_ID,
+        system_instruction=WCC_SYSTEM_PROMPT
+    )
+    
+    # Test questions
+    test_questions = [
+        "What is WCC?",
+        "How can I join?", 
+        "I'm new to coding, can WCC help me?"
+    ]
+    
+    print("\n📝 Testing with WCC-specific system prompt:\n")
+    for question in test_questions:
+        print(f"Q: {question}")
+        response = model_with_personality.generate_content(question)
+        print(f"A: {response.text}\n")
+        print("-" * 40)
+    
+    print("\n🌟 NOTICE: Responses are now WCC-focused and friendly! 🌟\n")
 
-# Test different temperature settings
-def test_parameters():
+
+# =============================================================================
+# STEP 3: ADD CONVERSATION MEMORY
+# =============================================================================
+
+def step_3_conversation_memory():
+    """
+    STEP 3: Add conversation memory
+    
+    What we're learning:
+    - How to maintain conversation context
+    - How to build multi-turn conversations
+    - How memory improves user experience
+    """
+    print("\n" + "=" * 60)
+    print("STEP 3: Adding Conversation Memory")
+    print("=" * 60)
+    
+    class WCCChatBot:
+        """Chatbot with conversation memory"""
+        
+        def __init__(self):
+            self.model = genai.GenerativeModel(
+                MODEL_ID,
+                system_instruction=WCC_SYSTEM_PROMPT
+            )
+            self.conversation_history = []
+        
+        def chat(self, user_input):
+            """Send message and get response with context"""
+            # Add user message to history
+            self.conversation_history.append({"role": "user", "parts": [user_input]})
+            
+            # Generate response with full history
+            response = self.model.generate_content(self.conversation_history)
+            
+            # Add assistant response to history
+            self.conversation_history.append({"role": "model", "parts": [response.text]})
+            
+            return response.text
+    
+    # Create chatbot instance
+    chatbot = WCCChatBot()
+    
+    print("\n💬 Testing conversation memory:\n")
+    
+    # First message
+    msg1 = "Hi, I'm Sarah and I'm new to programming"
+    print(f"You: {msg1}")
+    response1 = chatbot.chat(msg1)
+    print(f"Bot: {response1}\n")
+    
+    # Second message (bot should remember Sarah)
+    msg2 = "What programming language should I start with?"
+    print(f"You: {msg2}")
+    response2 = chatbot.chat(msg2)
+    print(f"Bot: {response2}\n")
+    
+    # Third message (bot should remember name and context)
+    msg3 = "Do you remember my name?"
+    print(f"You: {msg3}")
+    response3 = chatbot.chat(msg3)
+    print(f"Bot: {response3}\n")
+    
+    print("🧠 NOTICE: Bot remembers Sarah and the conversation context! 🧠\n")
+
+
+# =============================================================================
+# STEP 4: EXPLORE MODEL PARAMETERS
+# =============================================================================
+
+def step_4_model_parameters():
+    """
+    STEP 4: Explore model parameters
+    
+    What we're learning:
+    - How temperature affects creativity
+    - How top_p affects diversity
+    - How to tune parameters for different use cases
+    """
+    print("\n" + "=" * 60)
+    print("STEP 4: Understanding Model Parameters")
+    print("=" * 60)
+    
     question = "Write a creative welcome message for new WCC members"
     
-    print("🌡️ TEMPERATURE EXAMPLES:")
-    print("=" * 25)
+    print(f"\n📝 Question: {question}\n")
+    print("🌡️ TEMPERATURE EXAMPLES (Creativity):\n")
     
-    temperatures = [0.0, 0.7, 1.5]
+    temperatures = [
+        (0.0, "Deterministic - Same answer every time"),
+        (0.7, "Balanced - Recommended for most use cases"),
+        (1.5, "Very Creative - Different each time")
+    ]
     
-    for temp in temperatures:
-        print(f"\\nTemperature: {temp}")
-        print(f"Expected: {'Deterministic' if temp == 0.0 else 'Balanced' if temp == 0.7 else 'Very Creative'}")
-        print("-" * 20)
+    for temp, description in temperatures:
+        print(f"Temperature: {temp} ({description})")
+        print("-" * 40)
         
-        # Configure generation with specific temperature
         generation_config = genai.types.GenerationConfig(
             temperature=temp,
             max_output_tokens=100,
         )
         
         model_temp = genai.GenerativeModel(
-            'gemini-pro',
+            MODEL_ID,
             generation_config=generation_config
         )
         
         response = model_temp.generate_content(question)
-        print(f"Response: {response.text}\\n")
+        print(f"Response: {response.text}\n")
     
-    print("🎚️ TOP-P AND TOP-K EXAMPLES:")
-    print("=" * 25)
-    
-    # Test Top-p (nucleus sampling)
-    configs = [
-        {"top_p": 0.3, "description": "Conservative (focused)"},
-        {"top_p": 0.9, "description": "Balanced (recommended)"},
-        {"top_k": 5, "description": "Top-5 tokens only"},
-        {"top_k": 50, "description": "Top-50 tokens"}
-    ]
-    
-    for config in configs:
-        print(f"\\nConfig: {config}")
-        print("-" * 30)
-        
-        generation_config = genai.types.GenerationConfig(
-            temperature=0.7,
-            max_output_tokens=80,
-            **{k: v for k, v in config.items() if k != 'description'}
-        )
-        
-        model_param = genai.GenerativeModel(
-            'gemini-pro',
-            generation_config=generation_config
-        )
-        
-        response = model_param.generate_content("Describe WCC in one sentence")
-        print(f"Response: {response.text}\\n")
+    print("⚙️ NOTICE: Higher temperature = more creative/varied responses! ⚙️\n")
 
-# Run parameter tests
-test_parameters()
-
-print("⚙️ PARAMETERS EXPLORED! See how they change the responses! ⚙️\\n")
-"""
 
 # =============================================================================
-# SECTION 5: STREAMLIT WEB INTERFACE
+# STEP 5: STREAMLIT WEB INTERFACE
 # =============================================================================
 
-
-import streamlit as st
-
-print("STEP 5: Creating Web Interface with Streamlit")
-print("-" * 45)
-
-# Streamlit Web App
-def create_streamlit_app():
-    '''
-    To run this section:
-    1. Delete the triple quotes around this entire section
-    2. Save this file as 'wcc_demo.py'
-    3. Run: streamlit run wcc_demo.py
-    '''
+def step_5_streamlit_interface():
+    """
+    STEP 5: Create web interface with Streamlit
+    
+    What we're learning:
+    - How to build interactive web apps
+    - How to manage UI state
+    - How to create user-friendly interfaces
+    """
+    try:
+        import streamlit as st
+    except ImportError:
+        print("\n❌ Streamlit not installed!")
+        print("Install it with: pip install streamlit")
+        return
     
     st.set_page_config(
         page_title="WCC Info Bot",
@@ -298,16 +311,16 @@ def create_streamlit_app():
                 model_ui = genai.GenerativeModel(
                     MODEL_ID,
                     generation_config=generation_config,
-                    system_instruction=wcc_system_prompt
+                    system_instruction=WCC_SYSTEM_PROMPT
                 )
                 
                 # Create conversation context
-                context = "\\n".join([
+                context = "\n".join([
                     f"{msg['role']}: {msg['content']}" 
                     for msg in st.session_state.messages[-5:]  # Last 5 messages
                 ])
                 
-                full_prompt = f"Conversation context:\\n{context}\\n\\nUser: {prompt}"
+                full_prompt = f"Conversation context:\n{context}\n\nUser: {prompt}"
                 response = model_ui.generate_content(full_prompt)
                 
                 st.markdown(response.text)
@@ -338,53 +351,26 @@ def create_streamlit_app():
         - 🎯 **Top-p**: Lower = more focused responses
         ''')
 
-# Instructions for running Streamlit
-print('''
-🌐 TO CREATE WEB INTERFACE:
-========================
-1. Delete the triple quotes around SECTION 5 above
-2. Save this file as 'wcc_demo.py'  
-3. Install Streamlit: pip install streamlit
-4. Run: streamlit run wcc_demo.py
-5. Your browser will open with the web app!
-
-📱 FEATURES OF THE WEB APP:
-- Interactive chat interface
-- Adjustable model parameters
-- Conversation history
-- Mobile-friendly design
-''')
-
-# Only run Streamlit if this section is uncommented and file is run with streamlit
-if __name__ == "__main__" and "streamlit" in os.environ.get("_", ""):
-    create_streamlit_app()
-
 
 # =============================================================================
-# DEMO COMPLETION
+# MAIN: UNCOMMENT STEPS TO RUN
 # =============================================================================
 
-print("🎓 SESSION 1 DEMO COMPLETE!")
-print("=" * 30)
-print("""
-WHAT WE BUILT TODAY:
-✅ Basic API integration with Gemini
-✅ AI personality with system prompts  
-✅ Conversation memory management
-✅ Model parameter experimentation
-✅ Web interface with Streamlit
-
-NEXT STEPS:
-1. Uncomment sections one by one as you follow along
-2. Experiment with different prompts and parameters
-3. Customize the WCC knowledge base
-4. Deploy your bot and share with the community!
-
-HOMEWORK:
-- Enhance your bot with more WCC information
-- Try different model parameters
-- Add your bot to GitHub
-- Come to Session 2 with questions!
-
-Happy coding! 💪🌟
-""")
+if __name__ == "__main__":
+    # UNCOMMENT EACH STEP TO RUN IT
+    # Each step builds on the previous one, showing clear code differences!
+    
+    # Step 1: Basic API integration with Gemini
+    step_1_basic_api_call()
+    
+    # Step 2: AI personality with system prompts
+    # step_2_add_personality()
+    
+    # Step 3: Conversation memory management
+    # step_3_conversation_memory()
+    
+    # Step 4: Model parameter experimentation
+    # step_4_model_parameters()
+    
+    # Step 5: Web interface with Streamlit
+    # step_5_streamlit_interface()  # Run with: streamlit run wcc_demo.py
